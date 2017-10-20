@@ -26,21 +26,19 @@ module DSP where
     dbl :: Int -> Double
     dbl i = fromIntegral i 
 
-    rcosFir :: (Int, Double, Int, PulseShape) -> [Double]
+    pulseShapingFilter :: (Int, Double, Int, PulseShape) -> [Double]
     rcosFir (sps, beta, nSymbols, Normal) =
         (reverse taps) ++ [1] ++ taps
         where
             hh   = h (sps, beta)
             taps = [hh i | i <- [1..20]]
+    pulseShapingFilter (sps, beta, nSymbols, Sqrt  ) = 
+        []
 
+    h :: (Int, Double) -> Int -> Double
+    h (sps, beta) i =
             --twoBeta = 2 * beta
             --h i | twoBeta * i == dbl(sps) = (pi/4) * sincN(1/twoBeta)
             --    | otherwise = sincN(xi) * cos(pi*beta*xi)/(1.0 -(twoBeta*xi)^2)
             --    where xi = (dbl i) / (dbl sps)
             --taps = [h i | i <- [1 .. 20]]
-    rcosFir (sps, beta, nSymbols, Sqrt  ) = 
-        []
-
-    h :: (Int, Double) -> Int -> Double
-    h (sps, beta) i =
-        0.0
