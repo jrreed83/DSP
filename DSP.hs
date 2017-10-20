@@ -5,6 +5,8 @@ module DSP where
                                  , nSymbols         :: Int 
                                  } deriving (Show) 
 
+    data PulseShape = Normal | Sqrt deriving (Eq, Show)
+
     numSamples :: FilterSpec -> Int
     numSamples spec
          = (m * n) + 1
@@ -21,23 +23,24 @@ module DSP where
     sincN :: Double -> Double
     sincN x = sinc (pi * x)
 
-    raisedCosine :: FilterSpec -> Int -> Double
-    raisedCosine spec i =  
-        if abs(iD) == ( spsD / twoBeta) then
-            (pi/4) * sincN(1/twoBeta)
-        else 
-            sincN(xi) * cos(pi*beta*xi)/(1.0 -(2.0*beta*xi)^2)
-        where beta    = rollOff spec
-              twoBeta = 2 * beta
-              sps     = samplesPerSymbol spec
-              iD      = (fromIntegral i)
-              spsD    = (fromIntegral sps)
-              xi      = iD/spsD
-    
-    design :: FilterSpec -> [Double]
-    design spec = 
-        [h i | i <- [-5..5]]
-        where h = raisedCosine spec
---    raisedCosine :: FilterSpec -> [Float]
---    raisedCosine spec = 
---        let x0 = 1
+    dbl :: Int -> Double
+    dbl i = fromIntegral i 
+
+    rcosFir :: (Int, Double, Int, PulseShape) -> [Double]
+    rcosFir (sps, beta, nSymbols, Normal) =
+        (reverse taps) ++ [1] ++ taps
+        where
+            hh   = h (sps, beta)
+            taps = [hh i | i <- [1..20]]
+
+            --twoBeta = 2 * beta
+            --h i | twoBeta * i == dbl(sps) = (pi/4) * sincN(1/twoBeta)
+            --    | otherwise = sincN(xi) * cos(pi*beta*xi)/(1.0 -(twoBeta*xi)^2)
+            --    where xi = (dbl i) / (dbl sps)
+            --taps = [h i | i <- [1 .. 20]]
+    rcosFir (sps, beta, nSymbols, Sqrt  ) = 
+        []
+
+    h :: (Int, Double) -> Int -> Double
+    h (sps, beta) i =
+        0.0
